@@ -6,18 +6,26 @@
 package GUI;
 
 import DBLayer.DBConnection;
+import app.bolivia.swing.JCTextField;
+import java.awt.TextField;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 public class LoginUI extends javax.swing.JFrame {
+    
+    public static String tempPosition;
 
     /**
      * Creates new form LoginUI
      */
     public LoginUI() {
         initComponents();
+        TextField password = new TextField(20);
+        password.setEchoChar('*');
+                
     }
     
     //User validation
@@ -48,11 +56,27 @@ public class LoginUI extends javax.swing.JFrame {
             pst.setString(1, username);
             pst.setString(2, password);
             ResultSet rs = pst.executeQuery();
+            
+            Statement st = con.createStatement();
+            ResultSet rs1 = st.executeQuery("select position from users where username = '" + username + "'");
+            rs1.next();
+            String uname = rs1.getString("position");
 
-            if (rs.next()) {
+            if (uname.equals("Admin")) {
+                tempPosition = "Admin";
                 DashboardUI ui = new DashboardUI();
                 ui.setVisible(true);
-                this.setVisible(false);
+                dispose();
+            } else if (uname.equals("Manager")){
+                tempPosition = "Manager";
+                DashboardUIManager ui = new DashboardUIManager();
+                ui.setVisible(true);
+                dispose();
+            } else if (uname.equals("Employee")){
+                tempPosition = "Employee";
+                DashboardUIEmployee ui = new DashboardUIEmployee();
+                ui.setVisible(true);
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Incorrect Username or Password!");
             }
@@ -82,9 +106,9 @@ public class LoginUI extends javax.swing.JFrame {
         txtusername = new app.bolivia.swing.JCTextField();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        txtpassword = new app.bolivia.swing.JCTextField();
         rSMaterialButtonCircle1 = new rojerusan.RSMaterialButtonCircle();
         jLabel10 = new javax.swing.JLabel();
+        txtpassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -133,7 +157,6 @@ public class LoginUI extends javax.swing.JFrame {
         txtusername.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txtusername.setForeground(new java.awt.Color(0, 0, 0));
         txtusername.setFont(new java.awt.Font("Dialog", 0, 17)); // NOI18N
-        txtusername.setPlaceholder("Enter Username..");
         txtusername.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtusernameFocusLost(evt);
@@ -144,16 +167,10 @@ public class LoginUI extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Calibri", 0, 24)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Password:");
-        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 400, 120, -1));
+        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 420, 120, -1));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/icons8_Secure_50px.png"))); // NOI18N
-        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 430, 50, 50));
-
-        txtpassword.setBackground(new java.awt.Color(15, 160, 152));
-        txtpassword.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
-        txtpassword.setFont(new java.awt.Font("Dialog", 0, 17)); // NOI18N
-        txtpassword.setPlaceholder("Enter Password..");
-        jPanel2.add(txtpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 440, 270, -1));
+        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 440, 50, 50));
 
         rSMaterialButtonCircle1.setBackground(new java.awt.Color(187, 14, 14));
         rSMaterialButtonCircle1.setLabel("Login");
@@ -173,6 +190,11 @@ public class LoginUI extends javax.swing.JFrame {
             }
         });
         jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 0, 20, 40));
+
+        txtpassword.setBackground(new java.awt.Color(15, 160, 152));
+        txtpassword.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
+        txtpassword.setPreferredSize(new java.awt.Dimension(200, 32));
+        jPanel2.add(txtpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 450, 270, -1));
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 0, 540, 830));
 
@@ -244,7 +266,7 @@ public class LoginUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle1;
-    private app.bolivia.swing.JCTextField txtpassword;
+    private javax.swing.JPasswordField txtpassword;
     private app.bolivia.swing.JCTextField txtusername;
     // End of variables declaration//GEN-END:variables
 }
