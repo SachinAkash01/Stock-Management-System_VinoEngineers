@@ -5,12 +5,14 @@
  */
 package GUI;
 
+import Code.JavaEmailSender;
 import DBLayer.DBConnection;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 
@@ -109,6 +111,24 @@ public class IssueReturnStock extends javax.swing.JFrame {
 
             pst.setInt(1, quantity1);
             pst.setString(2, stock_id);
+            
+            //Sending emails for the managers informing stock in re-order limits
+            try {
+                if (quantity1 <= 5) {
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery("select email from users where position = 'Manager'");
+                    while (rs.next()){
+                        String email = rs.getString("email");
+
+                        JavaEmailSender j = new JavaEmailSender();
+                        j.createAndSendEmail(email, "STOCK IN RE-ORDER LIMIT", "This is to inform you that we've experienced a high demand of stock allocations and following stock, "+stockname.getText()+" where stock ID = "+stock_id+" is in re-order limit!   Vino Engineers");
+                    }
+                    
+                    JOptionPane.showMessageDialog(this, "Managers Informed via Email");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             int rowCount = pst.executeUpdate();
             if (rowCount > 0) {
@@ -116,6 +136,60 @@ public class IssueReturnStock extends javax.swing.JFrame {
             } else {
                 update = false;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //updating stock report (outflow)
+        try {
+            String month;
+            Date d = new Date();
+            int num = d.getMonth();
+            if (num == 0){
+                month = "january";
+            } else if (num == 1){
+                month = "february";
+            } else if (num == 2){
+                month = "march";
+            } else if (num == 3){
+                month = "april";
+            } else if (num == 4){
+                month = "may";
+            } else if (num == 5){
+                month = "june";
+            } else if (num == 6){
+                month = "july";
+            } else if (num == 7){
+                month = "august";
+            } else if (num == 8){
+                month = "september";
+            } else if (num == 9){
+                month = "october";
+            } else if (num == 10){
+                month = "november";
+            } else{
+                month = "december";
+            }
+            
+            Connection con = DBConnection.getConnection();
+            Statement st1 = con.createStatement();
+            
+            ResultSet Quantity1 = st1.executeQuery("select outflow,current from "+month+" where stockID = '"+stock_id+"'");
+            Quantity1.next();
+            int quantity1 =  Quantity1.getInt("outflow");
+            int current = Quantity1.getInt("current");
+            quantity1 += Quantity;
+            current -= Quantity;
+                        
+            String sql = "update "+month+" set outflow = ?, current = ? where stockID = ?;";
+            PreparedStatement pst = con.prepareStatement(sql);
+
+            pst.setInt(1, quantity1);
+            pst.setInt(2, current);
+            pst.setString(3, stock_id);
+
+            pst.executeUpdate();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,6 +223,60 @@ public class IssueReturnStock extends javax.swing.JFrame {
             } else {
                 update = false;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //updating stock report (inflow)
+        try {
+            String month;
+            Date d = new Date();
+            int num = d.getMonth();
+            if (num == 0){
+                month = "january";
+            } else if (num == 1){
+                month = "february";
+            } else if (num == 2){
+                month = "march";
+            } else if (num == 3){
+                month = "april";
+            } else if (num == 4){
+                month = "may";
+            } else if (num == 5){
+                month = "june";
+            } else if (num == 6){
+                month = "july";
+            } else if (num == 7){
+                month = "august";
+            } else if (num == 8){
+                month = "september";
+            } else if (num == 9){
+                month = "october";
+            } else if (num == 10){
+                month = "november";
+            } else{
+                month = "december";
+            }
+            
+            Connection con = DBConnection.getConnection();
+            Statement st1 = con.createStatement();
+            
+            ResultSet Quantity1 = st1.executeQuery("select outflow,current from "+month+" where stockID = '"+stock_id+"'");
+            Quantity1.next();
+            int quantity1 =  Quantity1.getInt("outflow");
+            int current = Quantity1.getInt("current");
+            quantity1 -= Quantity;
+            current += Quantity;
+                        
+            String sql = "update "+month+" set outflow = ?, current = ? where stockID = ?;";
+            PreparedStatement pst = con.prepareStatement(sql);
+
+            pst.setInt(1, quantity1);
+            pst.setInt(2, current);
+            pst.setString(3, stock_id);
+
+            pst.executeUpdate();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -497,8 +625,6 @@ public class IssueReturnStock extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel1MouseEntered
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
         dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
