@@ -6,12 +6,14 @@
 
 package GUI;
 
+import Code.JavaEmailSender;
 import DBLayer.DBConnection;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -82,7 +84,7 @@ public class StockDetails extends javax.swing.JFrame {
             ResultSet ID = st1.executeQuery("select stockID from stock;");
             
             boolean found = false;
-        
+            
             while(ID.next()) {
                 try {
                     String ID1 = ID.getString("stockID");
@@ -136,8 +138,91 @@ public class StockDetails extends javax.swing.JFrame {
                         e.printStackTrace();
                 }
             }
+            
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        
+        //insert into stock report (inflow)
+        try {
+            String month;
+            Date d = new Date();
+            int num = d.getMonth();
+            if (num == 0){
+                month = "january";
+            } else if (num == 1){
+                month = "february";
+            } else if (num == 2){
+                month = "march";
+            } else if (num == 3){
+                month = "april";
+            } else if (num == 4){
+                month = "may";
+            } else if (num == 5){
+                month = "june";
+            } else if (num == 6){
+                month = "july";
+            } else if (num == 7){
+                month = "august";
+            } else if (num == 8){
+                month = "september";
+            } else if (num == 9){
+                month = "october";
+            } else if (num == 10){
+                month = "november";
+            } else{
+                month = "december";
+            }
+            
+            Connection con = DBConnection.getConnection();
+            Statement st2 = con.createStatement();
+            ResultSet monthID = st2.executeQuery("select stockID from "+month+";");
+            
+            boolean found1 = false;
+            
+            while(monthID.next()) {
+                try {
+                    String monthID1 = monthID.getString("stockID");
+                    if (monthID1.equals(stockid)){ //if stock ID already exists in the stock report
+                        found1 = true;
+                        
+                        ResultSet Quantity1 = st2.executeQuery("select inflow,current from "+month+" where stockID ='"+monthID1+"'");
+                        Quantity1.next();
+                        int quantity2 =  Quantity1.getInt("inflow");
+                        int current = Quantity1.getInt("current");
+                        quantity2 += quantity;
+                        current += quantity;
+
+                        String sql = "update "+month+" set inflow = ?,current = ? where stockID = ?;";
+                        PreparedStatement pst = con.prepareStatement(sql);
+
+                        pst.setInt(1, quantity2);
+                        pst.setInt(2, current);
+                        pst.setString(3, monthID1);
+                        pst.executeUpdate();
+                        
+                        break;
+                    }
+                    if (!found1) { //if the stock ID do not exists in the stock report 
+                        Connection con2 = DBConnection.getConnection();
+                        String sql1 = "insert into "+month+"(stockID,itemName,inflow,outflow,current) values(?,?,?,?,?);";
+                        PreparedStatement pst1 = con2.prepareStatement(sql1);
+
+                        pst1.setString(1, stockid);
+                        pst1.setString(2, stockname);
+                        pst1.setInt(3, quantity);
+                        pst1.setInt(4, 0);
+                        pst1.setInt(5, quantity);
+                        
+                        pst1.executeUpdate();
+                            
+                        break;
+                    } 
+                }catch (Exception e) {
+                        e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
         }
 
         return added;
@@ -166,7 +251,26 @@ public class StockDetails extends javax.swing.JFrame {
             pst.setString(6, stockid);
 
             int rowCount = pst.executeUpdate();
+            
+            //Sending emails for the managers informing stock in re-order limits
+            try {
+                if (quantity <= 5) {
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery("select email from users where position = 'Manager'");
+                    while (rs.next()){
+                        String email = rs.getString("email");
 
+                        JavaEmailSender j = new JavaEmailSender();
+                        j.createAndSendEmail(email, "STOCK IN RE-ORDER LIMIT", "This is to inform you that we've experienced a high demand of stock allocations and following stock, "+stockname+" where stock ID = "+stockid+" is in re-order limit!   Vino Engineers");
+                    }
+                    
+                    JOptionPane.showMessageDialog(this, "Managers Informed via Email");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            
             if (rowCount > 0) {
                 updated = true;
             } else {
@@ -522,8 +626,6 @@ public class StockDetails extends javax.swing.JFrame {
     }//GEN-LAST:event_tblstockMouseClicked
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
         dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
