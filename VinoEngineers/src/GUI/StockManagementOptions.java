@@ -134,8 +134,6 @@ public class StockManagementOptions extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
         dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
