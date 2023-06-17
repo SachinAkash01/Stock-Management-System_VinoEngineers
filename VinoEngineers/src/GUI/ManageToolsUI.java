@@ -256,7 +256,7 @@ public class ManageToolsUI extends javax.swing.JFrame {
         txttoolid.setBackground(new java.awt.Color(0, 153, 153));
         txttoolid.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txttoolid.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
-        txttoolid.setPlaceholder("Enter Repair ID..");
+        txttoolid.setPlaceholder("Enter Tool ID..");
         jPanel1.add(txttoolid, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, 260, 40));
 
         jLabel14.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
@@ -268,7 +268,7 @@ public class ManageToolsUI extends javax.swing.JFrame {
         txtquantity.setBackground(new java.awt.Color(0, 153, 153));
         txtquantity.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txtquantity.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
-        txtquantity.setPlaceholder("Enter Customer ID..");
+        txtquantity.setPlaceholder("Enter Quantity.");
         jPanel1.add(txtquantity, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 360, 260, 40));
 
         jLabel16.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
@@ -280,7 +280,7 @@ public class ManageToolsUI extends javax.swing.JFrame {
         txttoolname.setBackground(new java.awt.Color(0, 153, 153));
         txttoolname.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txttoolname.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
-        txttoolname.setPlaceholder("Enter Repair Name..");
+        txttoolname.setPlaceholder("Enter Tool Name..");
         jPanel1.add(txttoolname, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 260, 260, 40));
 
         jLabel17.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
@@ -297,7 +297,7 @@ public class ManageToolsUI extends javax.swing.JFrame {
         txtsite.setBackground(new java.awt.Color(0, 153, 153));
         txtsite.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txtsite.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
-        txtsite.setPlaceholder("Enter Repair Cost..");
+        txtsite.setPlaceholder("Enter Assigned Site.");
         jPanel1.add(txtsite, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 460, 260, 40));
 
         rSMaterialButtonCircle1.setBackground(new java.awt.Color(204, 0, 0));
@@ -460,9 +460,21 @@ public class ManageToolsUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
-        dispose();
+        LoginUI tempPos = new LoginUI();
+        
+        if (tempPos.tempPosition.equals("Admin")){
+            DashboardUI ui = new DashboardUI();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Manager")){
+            DashboardUIManager ui = new DashboardUIManager();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Employee")){
+            DashboardUIEmployee ui = new DashboardUIEmployee();
+            ui.setVisible(true);
+            dispose();
+        }
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
