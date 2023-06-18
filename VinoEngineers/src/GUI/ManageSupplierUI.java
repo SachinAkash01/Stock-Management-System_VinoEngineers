@@ -435,9 +435,21 @@ public class ManageSupplierUI extends javax.swing.JFrame {
     }//GEN-LAST:event_tblsupplierMouseClicked
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
-        dispose();
+        LoginUI tempPos = new LoginUI();
+        
+        if (tempPos.tempPosition.equals("Admin")){
+            DashboardUI ui = new DashboardUI();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Manager")){
+            DashboardUIManager ui = new DashboardUIManager();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Employee")){
+            DashboardUIEmployee ui = new DashboardUIEmployee();
+            ui.setVisible(true);
+            dispose();
+        }
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
