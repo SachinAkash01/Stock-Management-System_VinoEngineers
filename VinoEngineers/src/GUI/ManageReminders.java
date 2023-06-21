@@ -5,6 +5,8 @@
  */
 package GUI;
 
+import Code.DateChecker;
+import Code.JavaEmailSender;
 import DBLayer.DBConnection;
 import java.awt.Color;
 import java.sql.Connection;
@@ -24,6 +26,7 @@ public class ManageReminders extends javax.swing.JFrame {
     
     Date reminderDate;
     String reminderid, remindername, description, status;
+    int userid;
     DefaultTableModel model;
 
     /**
@@ -43,12 +46,13 @@ public class ManageReminders extends javax.swing.JFrame {
             
             while (rs.next()){
                 String reminderID = rs.getString("reminderID");
+                int userID = rs.getInt("userID");
                 String reminderName = rs.getString("reminderName");
                 String Description = rs.getString("description");
                 Date Rdate = rs.getDate("date");
                 String Status = rs.getString("status");
                 
-                Object[] obj = {reminderID,reminderName,Description,Rdate,Status};
+                Object[] obj = {reminderID,userID,reminderName,Description,Rdate,Status};
                 model = (DefaultTableModel) tblreminder.getModel();
                 model.addRow(obj);
                 
@@ -61,6 +65,7 @@ public class ManageReminders extends javax.swing.JFrame {
     //clear all the text fields in the UI
     public void clearFields(){
         txtreminderid.setText("");
+        txtuserid.setText("");
         txtremindername.setText("");
         txtdescription.setText("");
     }
@@ -70,25 +75,52 @@ public class ManageReminders extends javax.swing.JFrame {
         
         boolean added = false;
         reminderid = txtreminderid.getText();
+        userid = Integer.parseInt(txtuserid.getText());
         remindername = txtremindername.getText();
         description = txtdescription.getText();
         reminderDate = reminderdate.getDatoFecha();
         status = reminderstatus.getSelectedItem().toString();
         
+        //convert date into sql date format
         long l1 = reminderDate.getTime();
         java.sql.Date rDate = new java.sql.Date(l1);
         
-        
         try {
             Connection con = DBConnection.getConnection();
-            String sql = "insert into reminders(reminderID,reminderName,description,date,status) values(?,?,?,?,?);";
+            String sql = "insert into reminders(reminderID,userID,reminderName,description,date,status) values(?,?,?,?,?,?);";
             PreparedStatement pst = con.prepareStatement(sql);
             
             pst.setString(1, reminderid);
-            pst.setString(2, remindername);
-            pst.setString(3, description);
-            pst.setDate(4, rDate);
-            pst.setString(5, status);
+            pst.setInt(2, userid);
+            pst.setString(3, remindername);
+            pst.setString(4, description);
+            pst.setDate(5, rDate);
+            pst.setString(6, status);
+            
+            //Get the current date
+            java.util.Date date = new java.util.Date();
+            long l2 = date.getTime();
+            java.sql.Date cDate = new java.sql.Date(l2);
+            
+            String date1 = rDate.toString();
+            String date2 = cDate.toString();
+            
+            //compare and send reminder email to the user
+            try {
+                if (date1.equals(date2)  && status.equals("Not Completed")) {
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery("select email from users where userid = "+userid+";");
+                    rs.next();
+                    String email = rs.getString("email");
+
+                    JavaEmailSender j = new JavaEmailSender();
+                    j.createAndSendEmail(email, "REMINDER FROM VINO ENGINEERS", "This is to inform you that your reminder for , "+description+" where reminder ID = "+reminderid+" is due today!   Vino Engineers");
+                    
+                    JOptionPane.showMessageDialog(this, "User Informed via Email!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             
             int rowCount = pst.executeUpdate();
             
@@ -109,24 +141,52 @@ public class ManageReminders extends javax.swing.JFrame {
     public boolean updateReminder(){
         boolean updated = false;
         reminderid = txtreminderid.getText();
+        userid = Integer.parseInt(txtuserid.getText()); 
         remindername = txtremindername.getText();
         description = txtdescription.getText();
         reminderDate = reminderdate.getDatoFecha();
         status = reminderstatus.getSelectedItem().toString();
         
+        //convert date into sql date format
         long l1 = reminderDate.getTime();
         java.sql.Date rDate = new java.sql.Date(l1);
         
         try {
             Connection con = DBConnection.getConnection();
-            String sql = "update reminders set  reminderName = ?,description = ?,date = ?,status = ? where reminderID = ?;";
+            String sql = "update reminders set  reminderName = ?,userID = ?,description = ?,date = ?,status = ? where reminderID = ?;";
             PreparedStatement pst = con.prepareStatement(sql);
                   
             pst.setString(1, remindername);
-            pst.setString(2, description);
-            pst.setDate(3, rDate);
-            pst.setString(4, status);
-            pst.setString(5, reminderid);
+            pst.setInt(2, userid);
+            pst.setString(3, description);
+            pst.setDate(4, rDate);
+            pst.setString(5, status);
+            pst.setString(6, reminderid);
+            
+            //Get the current date
+            java.util.Date date = new java.util.Date();
+            long l2 = date.getTime();
+            java.sql.Date cDate = new java.sql.Date(l2);
+            
+            String date1 = rDate.toString();
+            String date2 = cDate.toString();
+            
+            //compare and send reminder email to the user
+            try {
+                if (date1.equals(date2)  && status.equals("Not Completed")) {
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery("select email from users where userid = "+userid+";");
+                    rs.next();
+                    String email = rs.getString("email");
+
+                    JavaEmailSender j = new JavaEmailSender();
+                    j.createAndSendEmail(email, "REMINDER FROM VINO ENGINEERS", "This is to inform you that your reminder for , "+description+" where reminder ID = "+reminderid+" is due today!   Vino Engineers");
+                    
+                    JOptionPane.showMessageDialog(this, "User Informed via Email!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             
             int rowCount = pst.executeUpdate();
             if (rowCount > 0){
@@ -188,7 +248,7 @@ public class ManageReminders extends javax.swing.JFrame {
         txtremindername = new app.bolivia.swing.JCTextField();
         jLabel15 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        txtreminderid = new app.bolivia.swing.JCTextField();
+        txtuserid = new app.bolivia.swing.JCTextField();
         rSMaterialButtonCircle1 = new rojerusan.RSMaterialButtonCircle();
         rSMaterialButtonCircle2 = new rojerusan.RSMaterialButtonCircle();
         rSMaterialButtonCircle3 = new rojerusan.RSMaterialButtonCircle();
@@ -203,6 +263,9 @@ public class ManageReminders extends javax.swing.JFrame {
         jLabel18 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         reminderstatus = new javax.swing.JComboBox<>();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        txtreminderid = new app.bolivia.swing.JCTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -242,26 +305,26 @@ public class ManageReminders extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
         jLabel14.setForeground(new java.awt.Color(255, 255, 255));
         jLabel14.setText("Reminder Name:");
-        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 270, 130, 30));
+        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 360, 130, 30));
         jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 280, 50, -1));
 
         txtremindername.setBackground(new java.awt.Color(0, 153, 153));
         txtremindername.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
         txtremindername.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
         txtremindername.setPlaceholder("Enter Reminder Name..");
-        jPanel1.add(txtremindername, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 300, 260, 40));
+        jPanel1.add(txtremindername, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, 260, 40));
 
         jLabel15.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
         jLabel15.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel15.setText("Reminder ID:");
-        jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 160, 130, 30));
+        jLabel15.setText("User ID:");
+        jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 260, 130, 30));
         jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 50, -1));
 
-        txtreminderid.setBackground(new java.awt.Color(0, 153, 153));
-        txtreminderid.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
-        txtreminderid.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
-        txtreminderid.setPlaceholder("Enter Reminder ID..");
-        jPanel1.add(txtreminderid, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 260, 40));
+        txtuserid.setBackground(new java.awt.Color(0, 153, 153));
+        txtuserid.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
+        txtuserid.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
+        txtuserid.setPlaceholder("Enter Reminder ID..");
+        jPanel1.add(txtuserid, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 290, 260, 40));
 
         rSMaterialButtonCircle1.setBackground(new java.awt.Color(204, 0, 0));
         rSMaterialButtonCircle1.setHideActionText(true);
@@ -271,7 +334,7 @@ public class ManageReminders extends javax.swing.JFrame {
                 rSMaterialButtonCircle1ActionPerformed(evt);
             }
         });
-        jPanel1.add(rSMaterialButtonCircle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 660, 130, 70));
+        jPanel1.add(rSMaterialButtonCircle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 730, 130, 70));
 
         rSMaterialButtonCircle2.setBackground(new java.awt.Color(204, 0, 0));
         rSMaterialButtonCircle2.setLabel("ADD");
@@ -280,7 +343,7 @@ public class ManageReminders extends javax.swing.JFrame {
                 rSMaterialButtonCircle2ActionPerformed(evt);
             }
         });
-        jPanel1.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 660, 130, 70));
+        jPanel1.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 730, 130, 70));
 
         rSMaterialButtonCircle3.setBackground(new java.awt.Color(204, 0, 0));
         rSMaterialButtonCircle3.setLabel("UPDATE");
@@ -289,13 +352,13 @@ public class ManageReminders extends javax.swing.JFrame {
                 rSMaterialButtonCircle3ActionPerformed(evt);
             }
         });
-        jPanel1.add(rSMaterialButtonCircle3, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 660, 130, 70));
+        jPanel1.add(rSMaterialButtonCircle3, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 730, 130, 70));
         jPanel1.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 380, 50, -1));
 
         jLabel23.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
         jLabel23.setForeground(new java.awt.Color(255, 255, 255));
         jLabel23.setText("Description:");
-        jPanel1.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 380, 130, 30));
+        jPanel1.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 470, 130, 30));
         jPanel1.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 480, 50, -1));
 
         txtdescription.setBackground(new java.awt.Color(0, 153, 153));
@@ -307,32 +370,32 @@ public class ManageReminders extends javax.swing.JFrame {
                 txtdescriptionActionPerformed(evt);
             }
         });
-        jPanel1.add(txtdescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, 260, 40));
+        jPanel1.add(txtdescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 500, 260, 40));
 
-        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/empid.png"))); // NOI18N
-        jPanel1.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 50, 50));
+        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/icons8_Account_50px.png"))); // NOI18N
+        jPanel1.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 280, 50, 50));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/icons8_menu_48px_1.png"))); // NOI18N
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 50, -1));
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 490, 50, -1));
 
         jLabel19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/icons8_Rewind_48px.png"))); // NOI18N
-        jPanel1.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 290, 50, 50));
+        jPanel1.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 380, 50, 50));
 
         reminderdate.setBackground(new java.awt.Color(15, 160, 152));
         reminderdate.setColorBackground(new java.awt.Color(14, 118, 112));
         reminderdate.setColorForeground(new java.awt.Color(14, 118, 112));
         reminderdate.setPlaceholder("Select Reminder Date");
-        jPanel1.add(reminderdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 550, 200, 40));
+        jPanel1.add(reminderdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 640, 200, 40));
 
         jLabel18.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
         jLabel18.setForeground(new java.awt.Color(255, 255, 255));
         jLabel18.setText("Reminder Date:");
-        jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 510, 130, 30));
+        jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 600, 130, 30));
 
         jLabel21.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
         jLabel21.setForeground(new java.awt.Color(255, 255, 255));
         jLabel21.setText("Status:");
-        jPanel1.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 500, 70, 50));
+        jPanel1.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 590, 70, 50));
 
         reminderstatus.setBackground(new java.awt.Color(0, 102, 102));
         reminderstatus.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
@@ -341,7 +404,21 @@ public class ManageReminders extends javax.swing.JFrame {
         reminderstatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Not Completed", "Completed" }));
         reminderstatus.setToolTipText("");
         reminderstatus.setBorder(null);
-        jPanel1.add(reminderstatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 550, 160, 40));
+        jPanel1.add(reminderstatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 640, 160, 40));
+
+        jLabel16.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel16.setText("Reminder ID:");
+        jPanel1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 160, 130, 30));
+
+        jLabel20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/empid.png"))); // NOI18N
+        jPanel1.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 50, 50));
+
+        txtreminderid.setBackground(new java.awt.Color(0, 153, 153));
+        txtreminderid.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
+        txtreminderid.setFont(new java.awt.Font("sansserif", 0, 17)); // NOI18N
+        txtreminderid.setPlaceholder("Enter Reminder ID..");
+        jPanel1.add(txtreminderid, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 260, 40));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -367,11 +444,11 @@ public class ManageReminders extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Reminder ID", "Reminder Name", "Description", "Date", "Status"
+                "Reminder ID", "User ID", "Reminder Name", "Description", "Date", "Status"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -393,7 +470,7 @@ public class ManageReminders extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tblreminder);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, 890, 350));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, 920, 350));
 
         jPanel5.setBackground(new java.awt.Color(0, 0, 0));
 
@@ -447,9 +524,21 @@ public class ManageReminders extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
-        dispose();
+        LoginUI tempPos = new LoginUI();
+        
+        if (tempPos.tempPosition.equals("Admin")){
+            DashboardUI ui = new DashboardUI();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Manager")){
+            DashboardUIManager ui = new DashboardUIManager();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Employee")){
+            DashboardUIEmployee ui = new DashboardUIEmployee();
+            ui.setVisible(true);
+            dispose();
+        }
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
@@ -509,10 +598,11 @@ public class ManageReminders extends javax.swing.JFrame {
         TableModel model = tblreminder.getModel();
 
         txtreminderid.setText(model.getValueAt(rowNo, 0).toString());
-        txtremindername.setText(model.getValueAt(rowNo, 1).toString());
-        txtdescription.setText(model.getValueAt(rowNo, 2).toString());
-        reminderdate.setDatoFecha((Date) model.getValueAt(rowNo, 3));
-        reminderstatus.setSelectedItem(model.getValueAt(rowNo, 4));
+        txtuserid.setText(model.getValueAt(rowNo, 1).toString());
+        txtremindername.setText(model.getValueAt(rowNo, 2).toString());
+        txtdescription.setText(model.getValueAt(rowNo, 3).toString());
+        reminderdate.setDatoFecha((Date) model.getValueAt(rowNo, 4));
+        reminderstatus.setSelectedItem(model.getValueAt(rowNo, 5));
     }//GEN-LAST:event_tblreminderMouseClicked
 
     /**
@@ -556,10 +646,12 @@ public class ManageReminders extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
@@ -581,5 +673,6 @@ public class ManageReminders extends javax.swing.JFrame {
     private app.bolivia.swing.JCTextField txtdescription;
     private app.bolivia.swing.JCTextField txtreminderid;
     private app.bolivia.swing.JCTextField txtremindername;
+    private app.bolivia.swing.JCTextField txtuserid;
     // End of variables declaration//GEN-END:variables
 }
