@@ -5,18 +5,58 @@
  */
 package GUI;
 
+import DBLayer.DBConnection;
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Date;
+import javax.swing.table.DefaultTableModel;
 
 public class StockReportUI extends javax.swing.JFrame {
     
     Color mouseEnterColor = new Color(255, 0, 0);
     Color mouseExitColor = new Color(204, 0, 0);
+    
+    String month;
+    DefaultTableModel model;
 
     /**
      * Creates new form StockReportUI
      */
     public StockReportUI() {
         initComponents();
+    }
+    
+    public void setStockReportToTable(){
+        try {
+            month = txtmonth.getSelectedItem().toString();
+            
+            Connection con = DBConnection.getConnection();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select * from "+month+";");
+            
+            while (rs.next()){
+                String stockID = rs.getString("stockID");
+                String itemName = rs.getString("itemName");
+                int inflow = rs.getInt("inflow");
+                int outflow = rs.getInt("outflow");
+                int current = rs.getInt("current");
+                
+                Object[] obj = {stockID,itemName,inflow,outflow,current};
+                model = (DefaultTableModel) tblStockReport.getModel();
+                model.addRow(obj);
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    //method to clear table
+    public void clearTable(){
+        DefaultTableModel model = (DefaultTableModel) tblStockReport.getModel();
+        model.setRowCount(0);
     }
 
     /**
@@ -29,8 +69,6 @@ public class StockReportUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        rSMaterialButtonCircle1 = new rojerusan.RSMaterialButtonCircle();
-        rSMaterialButtonCircle2 = new rojerusan.RSMaterialButtonCircle();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
@@ -41,30 +79,13 @@ public class StockReportUI extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtmonth = new javax.swing.JComboBox<>();
         jLabel21 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btngenerate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        rSMaterialButtonCircle1.setBackground(new java.awt.Color(204, 0, 0));
-        rSMaterialButtonCircle1.setText("Delete");
-        rSMaterialButtonCircle1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rSMaterialButtonCircle1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(rSMaterialButtonCircle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1330, 690, 170, 70));
-
-        rSMaterialButtonCircle2.setText("Print");
-        rSMaterialButtonCircle2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rSMaterialButtonCircle2ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1330, 610, 170, 70));
 
         jPanel2.setBackground(new java.awt.Color(204, 0, 0));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -169,16 +190,21 @@ public class StockReportUI extends javax.swing.JFrame {
         jLabel21.setText("Month:");
         jPanel1.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, 70, 40));
 
-        jButton1.setBackground(new java.awt.Color(0, 153, 153));
-        jButton1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(0, 0, 0));
-        jButton1.setText("Generate Report");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        btngenerate.setBackground(new java.awt.Color(0, 153, 153));
+        btngenerate.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        btngenerate.setForeground(new java.awt.Color(0, 0, 0));
+        btngenerate.setText("Generate Report");
+        btngenerate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btngenerateMouseClicked(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 160, 180, 40));
+        btngenerate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btngenerateActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btngenerate, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 160, 180, 40));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -206,9 +232,21 @@ public class StockReportUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        DashboardUI ui = new DashboardUI();
-        ui.setVisible(true);
-        dispose();
+        LoginUI tempPos = new LoginUI();
+        
+        if (tempPos.tempPosition.equals("Admin")){
+            DashboardUI ui = new DashboardUI();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Manager")){
+            DashboardUIManager ui = new DashboardUIManager();
+            ui.setVisible(true);
+            dispose();
+        } else if (tempPos.tempPosition.equals("Employee")){
+            DashboardUIEmployee ui = new DashboardUIEmployee();
+            ui.setVisible(true);
+            dispose();
+        }
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
@@ -223,18 +261,16 @@ public class StockReportUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_jLabel2MouseClicked
 
-    private void rSMaterialButtonCircle1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle1ActionPerformed
-        //delete stock report
-    }//GEN-LAST:event_rSMaterialButtonCircle1ActionPerformed
-
-    private void rSMaterialButtonCircle2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rSMaterialButtonCircle2ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btngenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btngenerateActionPerformed
         //generate stock report
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btngenerateActionPerformed
+
+    private void btngenerateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btngenerateMouseClicked
+        // TODO add your handling code here:
+        clearTable();
+        setStockReportToTable();
+    }//GEN-LAST:event_btngenerateMouseClicked
 
     /**
      * @param args the command line arguments
@@ -272,7 +308,7 @@ public class StockReportUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btngenerate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel21;
@@ -282,8 +318,6 @@ public class StockReportUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
-    private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle1;
-    private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle2;
     private rojeru_san.complementos.RSTableMetro tblStockReport;
     private javax.swing.JComboBox<String> txtmonth;
     // End of variables declaration//GEN-END:variables
