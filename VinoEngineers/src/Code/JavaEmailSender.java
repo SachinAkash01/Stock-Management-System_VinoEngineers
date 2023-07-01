@@ -16,8 +16,8 @@ public class JavaEmailSender {
     private String msgText = new String(); 
 
     final String USER_NAME;  //User name of the Google(gmail) account
-    final String PASSSWORD = "xxqhrqgfdrtyqday";  //Password of the Google(gmail) account
-    final String FROM_ADDRESS = "vinoengineerslk@gmail.com";  //From addresss
+    final String PASSSWORD = "password";  //Password of the Google(gmail) account
+    final String FROM_ADDRESS = "vinoengineerslk@gmail.co";  //From addresss
 
     public JavaEmailSender() {
         this.msgSubject = new String();
@@ -48,7 +48,7 @@ public class JavaEmailSender {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.ssl.trust", "*");
         props.put("mail.smtp.user", "vinoengineerslk@gmail.com");
-        props.put("mail.smtp.password", "xxqhrqgfdrtyqday");
+        props.put("mail.smtp.password", "password");
         props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
@@ -56,7 +56,7 @@ public class JavaEmailSender {
                 new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("vinoengineerslk@gmail.com", "xxqhrqgfdrtyqday");
+                return new PasswordAuthentication("vinoengineerslk@gmail.com", "password");
             }
         });
 
