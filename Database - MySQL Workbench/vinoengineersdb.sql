@@ -16,6 +16,111 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `april`
+--
+
+DROP TABLE IF EXISTS `april`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `april` (
+  `stockID` varchar(10) NOT NULL,
+  `itemName` varchar(45) DEFAULT NULL,
+  `inflow` int DEFAULT NULL,
+  `outflow` int DEFAULT NULL,
+  `current` int DEFAULT NULL,
+  PRIMARY KEY (`stockID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `april`
+--
+
+LOCK TABLES `april` WRITE;
+/*!40000 ALTER TABLE `april` DISABLE KEYS */;
+/*!40000 ALTER TABLE `april` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `july`
+--
+
+DROP TABLE IF EXISTS `july`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `july` (
+  `stockID` varchar(20) NOT NULL,
+  `itemName` varchar(45) DEFAULT NULL,
+  `inflow` int DEFAULT NULL,
+  `outflow` int DEFAULT NULL,
+  `current` int DEFAULT NULL,
+  PRIMARY KEY (`stockID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `july`
+--
+
+LOCK TABLES `july` WRITE;
+/*!40000 ALTER TABLE `july` DISABLE KEYS */;
+/*!40000 ALTER TABLE `july` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `june`
+--
+
+DROP TABLE IF EXISTS `june`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `june` (
+  `stockID` varchar(10) NOT NULL,
+  `itemName` varchar(45) DEFAULT NULL,
+  `inflow` varchar(45) DEFAULT NULL,
+  `outflow` varchar(45) DEFAULT NULL,
+  `current` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`stockID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `june`
+--
+
+LOCK TABLES `june` WRITE;
+/*!40000 ALTER TABLE `june` DISABLE KEYS */;
+INSERT INTO `june` VALUES ('ST001','Breadboard','30','10','20'),('ST002','Earthing Wire','35','0','35');
+/*!40000 ALTER TABLE `june` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `may`
+--
+
+DROP TABLE IF EXISTS `may`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `may` (
+  `stockID` varchar(20) NOT NULL,
+  `itemName` varchar(45) DEFAULT NULL,
+  `inflow` int DEFAULT NULL,
+  `outflow` int DEFAULT NULL,
+  `current` int DEFAULT NULL,
+  PRIMARY KEY (`stockID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `may`
+--
+
+LOCK TABLES `may` WRITE;
+/*!40000 ALTER TABLE `may` DISABLE KEYS */;
+/*!40000 ALTER TABLE `may` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `reminders`
 --
 
@@ -24,12 +129,15 @@ DROP TABLE IF EXISTS `reminders`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reminders` (
   `reminderID` varchar(10) NOT NULL,
+  `userID` int DEFAULT NULL,
   `reminderName` varchar(45) DEFAULT NULL,
   `description` varchar(100) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `status` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`reminderID`),
-  UNIQUE KEY `reminderID_UNIQUE` (`reminderID`)
+  UNIQUE KEY `reminderID_UNIQUE` (`reminderID`),
+  KEY `userID_idx` (`userID`),
+  CONSTRAINT `userID` FOREIGN KEY (`userID`) REFERENCES `users` (`userid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -39,7 +147,7 @@ CREATE TABLE `reminders` (
 
 LOCK TABLES `reminders` WRITE;
 /*!40000 ALTER TABLE `reminders` DISABLE KEYS */;
-INSERT INTO `reminders` VALUES ('R001','Stock Orders','Order 10 Breadboards','2023-05-15','Not Completed');
+INSERT INTO `reminders` VALUES ('R001',100,'Stock Orders','Order 10 Breadboards','2023-06-09','Not Completed'),('R002',100,'Stock Orders','Order 10 earthing wire','2023-06-08','Not Completed');
 /*!40000 ALTER TABLE `reminders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -70,7 +178,7 @@ CREATE TABLE `stock` (
 
 LOCK TABLES `stock` WRITE;
 /*!40000 ALTER TABLE `stock` DISABLE KEYS */;
-INSERT INTO `stock` VALUES ('ST001','Breadboard',10,360,'Fundamental pieces when buidling circuits','ACL'),('ST002','Earthing wire',50,4180,'0.55mm^2 100m low resistance earthing wire','Kelani Cables');
+INSERT INTO `stock` VALUES ('ST001','Breadboard',20,360,'Fundamental pieces when buidling circuits','ACL'),('ST002','Earthing wire',35,4180,'0.55mm^2 100m low resistance earthing wire','Kelani Cables');
 /*!40000 ALTER TABLE `stock` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -127,7 +235,7 @@ CREATE TABLE `tools` (
 
 LOCK TABLES `tools` WRITE;
 /*!40000 ALTER TABLE `tools` DISABLE KEYS */;
-INSERT INTO `tools` VALUES ('T001','Ladder',2,'Galle','2023-04-05','2023-04-28'),('T002','Electric drill',3,'Kandy','2023-04-20','2023-05-02');
+INSERT INTO `tools` VALUES ('T001','Ladder',2,'Galle','2023-04-05','2023-04-28'),('T002','Electric drill',3,'Kandy','2023-04-20','2023-05-02'),('T003','hammer',3,'Gampaha','2023-05-15','2023-06-20');
 /*!40000 ALTER TABLE `tools` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -157,7 +265,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (100,'sachinakash','sachin@123','0783439022','akashmusix01@gmail.com','Admin'),(101,'manuja','manuja@123','0771236548','manuja@gmail.com','Manager'),(102,'pasindu','pasindu@123','0759846329','pasindu@gmail.com','Manager'),(103,'thaditha','thaditha@123','0789874562','thaditha@gmail.com','Manager'),(104,'dinidu','dinidu@123','0749632587','dinidu@gmail.com','Admin'),(105,'dineth','dineth@123','0727854126','dinethhesara@gmail.com','Employee'),(106,'theekshana','theekshana@123','0768521479','theekshana@gmail.com','Employee'),(107,'praveen','parvi@123','0773587524','praveen@gmail.com','Employee');
+INSERT INTO `users` VALUES (100,'sachinakash','sachin@123','0783439022','akashmusix01@gmail.com','Manager'),(101,'manuja','manuja@123','0771236548','manujatheekshana2001@gmail.com','Manager'),(102,'pasindu','pasindu@123','0759846329','pasindugunawardana66@gmail.com','Manager'),(103,'thaditha','thaditha@123','0789874562','thaditharodrigo22@gmail.com','Manager'),(104,'dinidu','dinidu@123','0749632587','dinidu@gmail.com','Admin'),(105,'dineth','dineth@123','0727854126','dinethhesara@gmail.com','Employee'),(106,'theekshana','theekshana@123','0768521479','theekshana@gmail.com','Employee'),(107,'praveen','parvi@123','0773587524','praveen@gmail.com','Employee');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -170,4 +278,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-11 21:32:54
+-- Dump completed on 2023-06-08  3:40:17
