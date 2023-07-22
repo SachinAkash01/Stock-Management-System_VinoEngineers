@@ -7,6 +7,7 @@
 package GUI;
 
 import Code.JavaEmailSender;
+import GUI.IssueReturnStock;
 import DBLayer.DBConnection;
 import java.awt.Color;
 import java.sql.Connection;
@@ -148,31 +149,8 @@ public class StockDetails extends javax.swing.JFrame {
             String month;
             Date d = new Date();
             int num = d.getMonth();
-            if (num == 0){
-                month = "january";
-            } else if (num == 1){
-                month = "february";
-            } else if (num == 2){
-                month = "march";
-            } else if (num == 3){
-                month = "april";
-            } else if (num == 4){
-                month = "may";
-            } else if (num == 5){
-                month = "june";
-            } else if (num == 6){
-                month = "july";
-            } else if (num == 7){
-                month = "august";
-            } else if (num == 8){
-                month = "september";
-            } else if (num == 9){
-                month = "october";
-            } else if (num == 10){
-                month = "november";
-            } else{
-                month = "december";
-            }
+            IssueReturnStock obj = new IssueReturnStock();
+            month = obj.getmonth(num);
             
             Connection con = DBConnection.getConnection();
             Statement st2 = con.createStatement();
