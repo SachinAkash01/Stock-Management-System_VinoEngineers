@@ -156,6 +156,23 @@ public class ManageSupplierUI extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) tblsupplier.getModel();
         model.setRowCount(0);
     }
+    
+    public void loginSession(String user){
+        if (user.equals("Admin")){
+            DashboardUI ui = new DashboardUI();
+            ui.setVisible(true);
+            dispose();
+            
+        } else if (user.equals("Manager")){
+            DashboardUIManager ui = new DashboardUIManager();
+            ui.setVisible(true);
+            dispose();
+        } else if (user.equals("Employee")){
+            DashboardUIEmployee ui = new DashboardUIEmployee();
+            ui.setVisible(true);
+            dispose();
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -437,19 +454,21 @@ public class ManageSupplierUI extends javax.swing.JFrame {
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
         LoginUI tempPos = new LoginUI();
         
-        if (tempPos.tempPosition.equals("Admin")){
-            DashboardUI ui = new DashboardUI();
-            ui.setVisible(true);
-            dispose();
-        } else if (tempPos.tempPosition.equals("Manager")){
-            DashboardUIManager ui = new DashboardUIManager();
-            ui.setVisible(true);
-            dispose();
-        } else if (tempPos.tempPosition.equals("Employee")){
-            DashboardUIEmployee ui = new DashboardUIEmployee();
-            ui.setVisible(true);
-            dispose();
-        }
+        loginSession(tempPos.tempPosition);
+        
+//        if (tempPos.tempPosition.equals("Admin")){
+//            DashboardUI ui = new DashboardUI();
+//            ui.setVisible(true);
+//            dispose();
+//        } else if (tempPos.tempPosition.equals("Manager")){
+//            DashboardUIManager ui = new DashboardUIManager();
+//            ui.setVisible(true);
+//            dispose();
+//        } else if (tempPos.tempPosition.equals("Employee")){
+//            DashboardUIEmployee ui = new DashboardUIEmployee();
+//            ui.setVisible(true);
+//            dispose();
+//        }
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
