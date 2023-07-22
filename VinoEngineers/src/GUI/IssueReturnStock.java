@@ -92,6 +92,37 @@ public class IssueReturnStock extends javax.swing.JFrame {
         txtquantityreturn.setText("");
     }
     
+    public String getmonth(int num){
+        String month="";
+        if (num == 0){
+                month = "january";
+            } else if (num == 1){
+                month = "february";
+            } else if (num == 2){
+                month = "march";
+            } else if (num == 3){
+                month = "april";
+            } else if (num == 4){
+                month = "may";
+            } else if (num == 5){
+                month = "june";
+            } else if (num == 6){
+                month = "july";
+            } else if (num == 7){
+                month = "august";
+            } else if (num == 8){
+                month = "september";
+            } else if (num == 9){
+                month = "october";
+            } else if (num == 10){
+                month = "november";
+            } else{
+                month = "december";
+            }
+        
+        return month;
+    }
+    
     public boolean updateStockDetailsIssue() {
         boolean update = false;
         stock_id = txtstockidissue.getText();
@@ -145,50 +176,28 @@ public class IssueReturnStock extends javax.swing.JFrame {
             String month;
             Date d = new Date();
             int num = d.getMonth();
-            if (num == 0){
-                month = "january";
-            } else if (num == 1){
-                month = "february";
-            } else if (num == 2){
-                month = "march";
-            } else if (num == 3){
-                month = "april";
-            } else if (num == 4){
-                month = "may";
-            } else if (num == 5){
-                month = "june";
-            } else if (num == 6){
-                month = "july";
-            } else if (num == 7){
-                month = "august";
-            } else if (num == 8){
-                month = "september";
-            } else if (num == 9){
-                month = "october";
-            } else if (num == 10){
-                month = "november";
-            } else{
-                month = "december";
-            }
+            month = getmonth(num);
             
             Connection con = DBConnection.getConnection();
             Statement st1 = con.createStatement();
             
             ResultSet Quantity1 = st1.executeQuery("select outflow,current from "+month+" where stockID = '"+stock_id+"'");
-            Quantity1.next();
-            int quantity1 =  Quantity1.getInt("outflow");
-            int current = Quantity1.getInt("current");
-            quantity1 += Quantity;
-            current -= Quantity;
-                        
-            String sql = "update "+month+" set outflow = ?, current = ? where stockID = ?;";
-            PreparedStatement pst = con.prepareStatement(sql);
+            if (Quantity1.next()){
+                int quantity1 =  Quantity1.getInt("outflow");
+                int current = Quantity1.getInt("current");
+                quantity1 += Quantity;
+                current -= Quantity;
 
-            pst.setInt(1, quantity1);
-            pst.setInt(2, current);
-            pst.setString(3, stock_id);
+                String sql = "update "+month+" set outflow = ?, current = ? where stockID = ?;";
+                PreparedStatement pst = con.prepareStatement(sql);
 
-            pst.executeUpdate();
+                pst.setInt(1, quantity1);
+                pst.setInt(2, current);
+                pst.setString(3, stock_id);
+
+                pst.executeUpdate();
+            }
+            
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -232,51 +241,27 @@ public class IssueReturnStock extends javax.swing.JFrame {
             String month;
             Date d = new Date();
             int num = d.getMonth();
-            if (num == 0){
-                month = "january";
-            } else if (num == 1){
-                month = "february";
-            } else if (num == 2){
-                month = "march";
-            } else if (num == 3){
-                month = "april";
-            } else if (num == 4){
-                month = "may";
-            } else if (num == 5){
-                month = "june";
-            } else if (num == 6){
-                month = "july";
-            } else if (num == 7){
-                month = "august";
-            } else if (num == 8){
-                month = "september";
-            } else if (num == 9){
-                month = "october";
-            } else if (num == 10){
-                month = "november";
-            } else{
-                month = "december";
-            }
+            month = getmonth(num);
             
             Connection con = DBConnection.getConnection();
             Statement st1 = con.createStatement();
             
             ResultSet Quantity1 = st1.executeQuery("select outflow,current from "+month+" where stockID = '"+stock_id+"'");
-            Quantity1.next();
-            int quantity1 =  Quantity1.getInt("outflow");
-            int current = Quantity1.getInt("current");
-            quantity1 -= Quantity;
-            current += Quantity;
-                        
-            String sql = "update "+month+" set outflow = ?, current = ? where stockID = ?;";
-            PreparedStatement pst = con.prepareStatement(sql);
+            if (Quantity1.next()){
+                int quantity1 =  Quantity1.getInt("outflow");
+                int current = Quantity1.getInt("current");
+                quantity1 -= Quantity;
+                current += Quantity;
 
-            pst.setInt(1, quantity1);
-            pst.setInt(2, current);
-            pst.setString(3, stock_id);
+                String sql = "update "+month+" set outflow = ?, current = ? where stockID = ?;";
+                PreparedStatement pst = con.prepareStatement(sql);
 
-            pst.executeUpdate();
-            
+                pst.setInt(1, quantity1);
+                pst.setInt(2, current);
+                pst.setString(3, stock_id);
+
+                pst.executeUpdate();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
