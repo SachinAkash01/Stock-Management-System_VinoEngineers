@@ -6,6 +6,7 @@
 package GUI;
 
 import Code.DateChecker;
+import GUI.ManageSupplierUI;
 import Code.JavaEmailSender;
 import DBLayer.DBConnection;
 import java.awt.Color;
@@ -525,20 +526,9 @@ public class ManageReminders extends javax.swing.JFrame {
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
         LoginUI tempPos = new LoginUI();
-        
-        if (tempPos.tempPosition.equals("Admin")){
-            DashboardUI ui = new DashboardUI();
-            ui.setVisible(true);
-            dispose();
-        } else if (tempPos.tempPosition.equals("Manager")){
-            DashboardUIManager ui = new DashboardUIManager();
-            ui.setVisible(true);
-            dispose();
-        } else if (tempPos.tempPosition.equals("Employee")){
-            DashboardUIEmployee ui = new DashboardUIEmployee();
-            ui.setVisible(true);
-            dispose();
-        }
+        ManageSupplierUI obj = new ManageSupplierUI();
+        obj.loginSession(tempPos.tempPosition);
+        dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
