@@ -16,7 +16,7 @@ public class JavaEmailSender {
     private String msgText = new String(); 
 
     final String USER_NAME;  //User name of the Google(gmail) account
-    final String PASSSWORD = "pwd";  //Password of the Google(gmail) account
+    final String PASSSWORD = "password";  //Password of the Google(gmail) account
     final String FROM_ADDRESS = "vinoengineerslk@gmail.co";  //From addresss
 
     public JavaEmailSender() {
