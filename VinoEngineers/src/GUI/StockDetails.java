@@ -728,5 +728,4 @@ public class StockDetails extends javax.swing.JFrame {
     private app.bolivia.swing.JCTextField txtstockname;
     private app.bolivia.swing.JCTextField txtsupplier;
     // End of variables declaration//GEN-END:variables
-
 }
